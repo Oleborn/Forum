@@ -1,0 +1,129 @@
+# ==============================================================================
+# Master-changelog Liquibase для forum-service.
+# Подключается из application.yaml: spring.liquibase.change-log
+# Все SQL-скрипты лежат в подпапке dbscripts/ рядом с этим файлом
+# (relativeToChangelogFile: true).
+#
+# Порядок важен: сначала корневые таблицы (без внешних ключей), затем
+# зависимые — чтобы REFERENCES указывали на уже существующие таблицы.
+#
+# Маппинг типов Java -> PostgreSQL:
+#   UUID (UUID v7, генерируется приложением)  -> uuid
+#   Instant (LocalDateTime с UTC)             -> timestamp with time zone
+#   String (с length)                         -> varchar(n)
+#   String (@Lob / columnDefinition = "TEXT") -> text
+#   Boolean / Long / Integer                  -> boolean / bigint / integer
+#   Enum (@Enumerated(EnumType.STRING))       -> varchar(20)
+#
+# Имена таблиц, колонок, FK, уникальных ограничений и индексов взяты
+# напрямую из @Table/@Column/@Index аннотаций сущностей.
+# ==============================================================================
+databaseChangeLog:
+  - changeSet:
+      id: 2026_09_06_v1_create_table_forum_users.sql
+      author: oleborn
+      comment: >
+        Создание таблицы forum_users (сущность ForumUser) — пользователь форума,
+        проекция из Auth/Profile сервисов. PK uuid, уникальные auth_user_id и
+        profile_user_id, индексы по username и role, версия для @Version.
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_forum_users.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя
+
+  - changeSet:
+      id: 2026_09_06_v1_create_table_topics.sql
+      author: oleborn
+      comment: >
+        Создание таблицы topics (сущность Topic) — раздел/категория форума.
+        FK fk_topic_moderator на forum_users.id (мягкая связь с модератором),
+        индексы idx_topic_moderator и idx_topic_sort_order, мягкое удаление.
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_topics.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя
+
+  - changeSet:
+      id: 2026_09_06_v1_create_table_branches.sql
+      author: oleborn
+      comment: >
+        Создание таблицы branches (сущность Branch) — ветка (thread) внутри
+        раздела. FK fk_branch_topic -> topics, fk_branch_user -> forum_users.
+        7 индексов, включая составной idx_branch_topic_pinned_date для ленты
+        (pinned DESC + last_comment_date DESC). Счётчики и last_post_id.
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_branches.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя
+
+  - changeSet:
+      id: 2026_09_06_v1_create_table_posts.sql
+      author: oleborn
+      comment: >
+        Создание таблицы posts (сущность Post) — стартовое сообщение ветки или
+        комментарий (вложенность один уровень через parent_id). FK:
+        fk_post_branch -> branches, fk_post_user -> forum_users, самоссылка
+        fk_post_parent -> posts. Индексы по branch/user/parent/deleted_at.
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_posts.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя
+
+  - changeSet:
+      id: 2026_09_06_v1_create_table_attachments.sql
+      author: oleborn
+      comment: >
+        Создание таблицы attachments (сущность Attachment) — метаданные файла,
+        прикреплённого к сообщению. FK fk_attachment_post -> posts.
+        Индекс idx_attachment_post для получения списка вложений сообщения.
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_attachments.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя
+
+  - changeSet:
+      id: 2026_09_06_v1_create_table_reactions.sql
+      author: oleborn
+      comment: >
+        Создание таблицы reactions (сущность Reaction) — реакция пользователя
+        на сообщение. FK fk_reaction_user -> forum_users, fk_reaction_post ->
+        posts. UNIQUE uk_reaction_user_post (user_id, post_id) гарантирует,
+        что пользователь ставит не более одной реакции на сообщение.
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_reactions.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя
+
+  - changeSet:
+      id: 2026_09_06_v1_create_table_subscriptions.sql
+      author: oleborn
+      comment: >
+        Создание таблицы subscriptions (сущность Subscription) — подписка
+        пользователя на ветку для уведомлений. FK fk_subscription_user ->
+        forum_users, fk_subscription_branch -> branches. UNIQUE
+        uk_subscription_user_branch исключает повторную подписку.
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_subscriptions.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя
+
+  - changeSet:
+      id: 2026_09_06_v1_create_table_moderation_audit_logs.sql
+      author: oleborn
+      comment: >
+        Создание таблицы moderation_audit_logs (сущность ModerationAuditLog) —
+        журнал действий модераторов. FK fk_audit_moderator и
+        fk_audit_target_user -> forum_users. Цель (пост/ветка/раздел/юзер)
+        хранится полиморфно: target_type + target_id (без FK, индекс idx_audit_target).
+      sqlFile:
+        path: dbscripts/2026_09_06_v1_create_table_moderation_audit_logs.sql
+        relativeToChangelogFile: true
+        splitStatements: true  # Рекомендуется true для большинства случаев
+        endDelimiter: ;        # Явное указание разделителя

@@ -29,9 +29,14 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+DEEPSEEK.md
+
 ### VS Code ###
 .vscode/
 forum-service/.gitattributes
 forum-service/mvnw*
 forum-service/lecture-02-infrastructure-and-migrations.md
 forum-service/.mvn
+forum-service/.env
+
+infra/.env
