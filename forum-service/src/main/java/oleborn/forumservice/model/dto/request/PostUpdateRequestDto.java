@@ -1,9 +1,11 @@
 package oleborn.forumservice.model.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+
 /**
  * Редактирование сообщения.
  */
 public record PostUpdateRequestDto(
-        String content
+        @NotBlank String content
 ) {
 }

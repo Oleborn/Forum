@@ -1,11 +1,16 @@
 package oleborn.forumservice.model.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+
 /**
  * Создание и обновление раздела форума.
  */
 public record TopicRequestDto(
-        String title,
+        @NotBlank @Size(max = 255) String title,
         String description,
-        Integer sortOrder
+        @NotNull @PositiveOrZero Integer sortOrder
 ) {
 }

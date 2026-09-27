@@ -1,5 +1,6 @@
 package oleborn.forumservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import oleborn.forumservice.model.dto.request.ReactionRequestDto;
 import oleborn.forumservice.model.dto.response.ReactionResponseDto;
@@ -27,7 +28,7 @@ public class ReactionController {
     @PostMapping
     public ResponseEntity<ReactionResponseDto> react(
             @PathVariable UUID postId,
-            @RequestBody ReactionRequestDto request,
+            @Valid @RequestBody ReactionRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 

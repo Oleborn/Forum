@@ -1,5 +1,6 @@
 package oleborn.forumservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import oleborn.forumservice.model.dto.common.PageResponseDto;
 import oleborn.forumservice.model.dto.request.AssignTopicModeratorRequestDto;
@@ -54,7 +55,7 @@ public class TopicController {
 
     @PostMapping
     public ResponseEntity<TopicResponseDto> create(
-            @RequestBody TopicRequestDto request,
+            @Valid @RequestBody TopicRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 
@@ -71,7 +72,7 @@ public class TopicController {
     @PutMapping("/{topicId}")
     public ResponseEntity<TopicResponseDto> update(
             @PathVariable UUID topicId,
-            @RequestBody TopicRequestDto request,
+            @Valid @RequestBody TopicRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 
@@ -85,7 +86,7 @@ public class TopicController {
     @PutMapping("/{topicId}/moderator")
     public ResponseEntity<TopicResponseDto> assignModerator(
             @PathVariable UUID topicId,
-            @RequestBody AssignTopicModeratorRequestDto request,
+            @Valid @RequestBody AssignTopicModeratorRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 
