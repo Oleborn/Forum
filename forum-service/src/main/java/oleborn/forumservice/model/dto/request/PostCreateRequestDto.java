@@ -1,13 +1,16 @@
 package oleborn.forumservice.model.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.UUID;
 
 /**
  * Создание комментария к ветке.
  */
 public record PostCreateRequestDto(
-        UUID branchId,
+        @NotNull UUID branchId,
         UUID parentId,
-        String content
+        @NotBlank String content
 ) {
 }

@@ -1,5 +1,6 @@
 package oleborn.forumservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import oleborn.forumservice.model.dto.common.PageResponseDto;
 import oleborn.forumservice.model.dto.request.PostCreateRequestDto;
@@ -63,7 +64,7 @@ public class PostController {
 
     @PostMapping("/posts")
     public ResponseEntity<PostResponseDto> createComment(
-            @RequestBody PostCreateRequestDto request,
+            @Valid @RequestBody PostCreateRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 
@@ -80,7 +81,7 @@ public class PostController {
     @PutMapping("/posts/{postId}")
     public ResponseEntity<PostResponseDto> update(
             @PathVariable UUID postId,
-            @RequestBody PostUpdateRequestDto request,
+            @Valid @RequestBody PostUpdateRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 

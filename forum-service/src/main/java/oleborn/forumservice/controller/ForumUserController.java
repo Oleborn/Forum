@@ -1,5 +1,6 @@
 package oleborn.forumservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import oleborn.forumservice.dictionary.Role;
 import oleborn.forumservice.model.dto.common.PageResponseDto;
@@ -62,7 +63,7 @@ public class ForumUserController {
     @PostMapping("/{userId}/ban")
     public ResponseEntity<ForumUserResponseDto> banUser(
             @PathVariable UUID userId,
-            @RequestBody BanUserRequestDto request,
+            @Valid @RequestBody BanUserRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 
@@ -85,7 +86,7 @@ public class ForumUserController {
     @PutMapping("/{userId}/role")
     public ResponseEntity<ForumUserResponseDto> changeRole(
             @PathVariable UUID userId,
-            @RequestBody ChangeUserRoleRequestDto request,
+            @Valid @RequestBody ChangeUserRoleRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 

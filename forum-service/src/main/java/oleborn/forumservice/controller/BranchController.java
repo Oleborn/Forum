@@ -1,5 +1,6 @@
 package oleborn.forumservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import oleborn.forumservice.model.dto.common.PageResponseDto;
 import oleborn.forumservice.model.dto.request.BranchCreateRequestDto;
@@ -60,7 +61,7 @@ public class BranchController {
 
     @PostMapping
     public ResponseEntity<BranchResponseDto> create(
-            @RequestBody BranchCreateRequestDto request,
+            @Valid @RequestBody BranchCreateRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 
@@ -77,7 +78,7 @@ public class BranchController {
     @PutMapping("/{branchId}")
     public ResponseEntity<BranchResponseDto> update(
             @PathVariable UUID branchId,
-            @RequestBody BranchUpdateRequestDto request,
+            @Valid @RequestBody BranchUpdateRequestDto request,
             @RequestHeader("X-Auth-UserId") UUID authUserId
     ) {
 
