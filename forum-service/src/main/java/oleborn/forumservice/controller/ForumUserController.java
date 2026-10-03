@@ -2,10 +2,10 @@ package oleborn.forumservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import oleborn.forumservice.dictionary.Role;
 import oleborn.forumservice.model.dto.common.PageResponseDto;
 import oleborn.forumservice.model.dto.request.BanUserRequestDto;
 import oleborn.forumservice.model.dto.request.ChangeUserRoleRequestDto;
+import oleborn.forumservice.model.dto.request.ForumUserFilterDto;
 import oleborn.forumservice.model.dto.response.ForumUserResponseDto;
 import oleborn.forumservice.service.ForumUserService;
 import org.springframework.data.domain.Pageable;
@@ -14,13 +14,13 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -40,18 +40,11 @@ public class ForumUserController {
 
     @GetMapping
     public ResponseEntity<PageResponseDto<ForumUserResponseDto>> getUsers(
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) Role role,
-            @RequestParam(required = false) Boolean banned,
+            @ModelAttribute("forumUserFilter") ForumUserFilterDto filter,
             @PageableDefault(size = 20, sort = "username", direction = Sort.Direction.ASC) Pageable pageable
     ) {
 
-        return ResponseEntity.ok(forumUserService.getUsers(
-                search,
-                role,
-                banned,
-                pageable
-        ));
+        return ResponseEntity.ok(forumUserService.getUsers(filter, pageable));
     }
 
     @GetMapping("/{userId}")
