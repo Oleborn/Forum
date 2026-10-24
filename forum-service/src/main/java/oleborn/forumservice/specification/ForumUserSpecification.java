@@ -14,9 +14,6 @@ import java.util.List;
  */
 public final class ForumUserSpecification {
 
-    private ForumUserSpecification() {
-    }
-
     /**
      * Условия выборки по фильтрам запроса: непереданный фильтр не накладывает
      * ограничения.

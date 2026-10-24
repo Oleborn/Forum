@@ -2,6 +2,7 @@ package oleborn.forumservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import oleborn.forumservice.exception.AccessDeniedOperationException;
+import oleborn.forumservice.exception.InvalidOperationException;
 import oleborn.forumservice.exception.ResourceNotFoundException;
 import oleborn.forumservice.mapper.PageResponseMapper;
 import oleborn.forumservice.mapper.PostMapper;
@@ -168,7 +169,7 @@ public class PostServiceImpl implements PostService {
         boolean nestedParent = parent.getParent() != null;
 
         if (anotherBranch || nestedParent) {
-            throw new IllegalArgumentException("Родитель должен быть стартовым сообщением этой ветки: id=" + parentId);
+            throw new InvalidOperationException("Родитель должен быть стартовым сообщением этой ветки: id=" + parentId);
         }
 
         return parent;

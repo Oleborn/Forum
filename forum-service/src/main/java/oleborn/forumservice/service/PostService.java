@@ -1,6 +1,7 @@
 package oleborn.forumservice.service;
 
 import oleborn.forumservice.exception.AccessDeniedOperationException;
+import oleborn.forumservice.exception.InvalidOperationException;
 import oleborn.forumservice.exception.ResourceNotFoundException;
 import oleborn.forumservice.model.dto.common.PageResponseDto;
 import oleborn.forumservice.model.dto.request.PostCreateRequestDto;
@@ -78,7 +79,7 @@ public interface PostService {
      * @return созданное сообщение
      * @throws ResourceNotFoundException если ветка, актор или родительское сообщение
      *                                   не найдены
-     * @throws IllegalArgumentException  если родитель относится к другой ветке или сам
+     * @throws InvalidOperationException если родитель относится к другой ветке или сам
      *                                   является комментарием
      */
     PostResponseDto createComment(
