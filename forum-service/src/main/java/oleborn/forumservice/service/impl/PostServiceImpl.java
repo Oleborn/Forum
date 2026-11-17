@@ -1,6 +1,9 @@
 package oleborn.forumservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import oleborn.forumservice.audit.Auditable;
+import oleborn.forumservice.dictionary.ModerationAction;
+import oleborn.forumservice.dictionary.ModerationTargetType;
 import oleborn.forumservice.exception.AccessDeniedOperationException;
 import oleborn.forumservice.exception.InvalidOperationException;
 import oleborn.forumservice.exception.ResourceNotFoundException;
@@ -135,8 +138,26 @@ public class PostServiceImpl implements PostService {
         return postMapper.toResponse(post);
     }
 
+    /**
+     * Помечает сообщение удалённым и записывает действие в журнал аудита.
+     *
+     * <p>Нюансы использования: запись в журнал создаётся аспектом после возврата метода,
+     * поэтому повторный вызов для уже удалённого сообщения данные не меняет, но новую
+     * запись аудита всё равно оставляет; право на удаление проверяется по автору сообщения.
+     *
+     * @param postId     идентификатор сообщения
+     * @param reason     причина удаления; {@code null} допустим
+     * @param authUserId идентификатор актора
+     * @author oleborn
+     * @since 2026-11-08
+     */
     @Override
     @Transactional
+    @Auditable(
+            action = ModerationAction.DELETE,
+            targetType = ModerationTargetType.POST,
+            targetIdParam = "postId"
+    )
     public void softDelete(
             UUID postId,
             String reason,

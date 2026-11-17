@@ -1,6 +1,9 @@
 package oleborn.forumservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import oleborn.forumservice.audit.Auditable;
+import oleborn.forumservice.dictionary.ModerationAction;
+import oleborn.forumservice.dictionary.ModerationTargetType;
 import oleborn.forumservice.exception.ResourceNotFoundException;
 import oleborn.forumservice.mapper.BranchMapper;
 import oleborn.forumservice.mapper.PageResponseMapper;
@@ -116,8 +119,26 @@ public class BranchServiceImpl implements BranchService {
         return branchMapper.toResponse(branch);
     }
 
+    /**
+     * Закрывает ветку и записывает действие в журнал аудита.
+     *
+     * <p>Нюансы использования: закрытие идемпотентно — повторный вызов не меняет данные,
+     * но оставляет новую запись аудита, так как она пишется после возврата метода; причина
+     * в сущности ветки не сохраняется и попадает только в журнал.
+     *
+     * @param branchId   идентификатор ветки
+     * @param reason     причина закрытия; {@code null} допустим
+     * @param authUserId идентификатор актора
+     * @author oleborn
+     * @since 2026-11-08
+     */
     @Override
     @Transactional
+    @Auditable(
+            action = ModerationAction.CLOSE,
+            targetType = ModerationTargetType.BRANCH,
+            targetIdParam = "branchId"
+    )
     public BranchResponseDto close(
             UUID branchId,
             String reason,
